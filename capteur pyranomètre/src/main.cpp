@@ -1,5 +1,7 @@
 #include <iostream>
+#include <Cappyrano.hpp>
 
 int main() {
-    std::cout << "Hello Easy C++ project!" << std::endl;
-}
+    
+
+} 
