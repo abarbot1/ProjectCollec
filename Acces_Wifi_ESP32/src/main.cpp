@@ -1,7 +1,7 @@
 #include <WiFi.h>
 
-const char* ssid = "yourNetworkName";
-const char* password = "yourNetworkPassword";
+const char* ssid = "raspi-webgui";
+const char* password = "ChangeMe";
 
 void setup(){
     Serial.begin(115200);
