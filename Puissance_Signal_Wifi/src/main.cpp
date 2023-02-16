@@ -1,6 +1,6 @@
 #include <WiFi.h>
-const char* ssid = "";   /*Replace SSID of your network*/
-const char* password = ""; /*Replace with Password of your Network*/
+const char* ssid = "immobladePoint";   /*Replace SSID of your network*/
+const char* password = "3M_VT-MJ_SU-N3"; /*Replace with Password of your Network*/
 void initWiFi() {
   WiFi.mode(WIFI_STA);  /*Initialize ESP32 WiFi in station mode*/
   WiFi.begin(ssid, password); /*Begin WiFi connection*/
