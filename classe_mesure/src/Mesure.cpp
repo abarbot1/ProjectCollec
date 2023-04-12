@@ -21,9 +21,9 @@ Mesure::Mesure(float valeur, std::string ID_ESP32) {
 
 void Mesure::setdate() {
 	date = time(0);
-	char* tmm = ctime(&date);
+	this->temps = ctime(&date);
 }
 
-void Mesure::getdate(){
-	std::cout<<tmm<<std::endl;
+char* Mesure::getdate(){
+	return this->temps;
 }

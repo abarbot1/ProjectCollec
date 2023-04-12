@@ -7,5 +7,5 @@ Mesure *mesure;
 
 int main() {
     mesure = new Mesure();
-    mesure ->setdate();
+    mesure ->getdate();
 }
