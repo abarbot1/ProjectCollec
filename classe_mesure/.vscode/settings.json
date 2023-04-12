@@ -1,0 +1,13 @@
+{
+    "files.associations": {
+        "*.tpp": "cpp"
+    },
+    "terminal.integrated.shell.windows": "cmd.exe",
+    "makefile.launchConfigurations": [
+        {
+            "cwd": "/home/snir2g1/Documents/projetcolec/ProjectCollec/classe_mesure/bin",
+            "binaryPath": "/home/snir2g1/Documents/projetcolec/ProjectCollec/classe_mesure/bin/main",
+            "binaryArgs": []
+        }
+    ]
+}

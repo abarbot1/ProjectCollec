@@ -38,7 +38,7 @@ void loop()
   Serial.print("T=");
   Serial.print(sts35.readTemperature());
   Serial.println(" C");
-  http.begin("http://10.10.33.161:3000/collectemp");
+  http.begin("http://10.10.33.179:3000/fact");
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   int httpCode = http.POST("temperature="+String(derniereTemp, 2));
   if (httpCode > 0)
