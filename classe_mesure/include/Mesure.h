@@ -10,6 +10,7 @@ private:
 	time_t date;
 	float valeur;
 	std::string ID_ESP32;
+	char* temps;
 
 public:
 	Mesure();
@@ -22,7 +23,7 @@ public:
 
 	void setdate();
 
-	void getdate();
+	char* getdate();
 };
 
 #endif
