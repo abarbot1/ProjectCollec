@@ -1,13 +1,12 @@
 CXX		  := g++
-CXX_FLAGS := -Wall -Wextra -std=c++17 -ggdb
-
+CXX_FLAGS := -lrt -pthread -lm 
 BIN		:= bin
 SRC		:= src
 INCLUDE	:= include
 LIB		:= lib
 
 LIBRARIES	:=
-EXECUTABLE	:= main
+EXECUTABLE	:= threadtest
 
 
 all: $(BIN)/$(EXECUTABLE)
