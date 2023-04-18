@@ -1,24 +1,25 @@
 #include <iostream>
 #include <thread>
-#include "serialib.h"
 #include <mutex>
+#include <fcntl.h>
+#include <unistd.h>
+#include <sys/ioctl.h>
+#include <linux/spi/spidev.h>
 
 using namespace std;
 
-serialib Serial; // déclaration de l'objet Serial de la bibliothèque serialib
+mutex SPIMutex; // déclaration du mutex pour protéger l'accès aux données de la voie SPI
 
-mutex SerialMutex; // déclaration du mutex pour protéger l'accès aux données de la liaison série
-
-// Fonction thread pour la lecture de données sur la liaison série
-void SerialReadThread()
+// Fonction thread pour la lecture de données sur la voie SPI
+void SPIReadThread(int spi_fd)
 {
     while (true)
     {
         char buf[1024];
-        int n = Serial.readBytes(buf, sizeof(buf)); // lecture de données sur la liaison série
+        int n = read(spi_fd, buf, sizeof(buf)); // lecture de données sur la voie SPI
         if (n > 0)
         {
-            lock_guard<mutex> lock(SerialMutex); // verrouillage du mutex
+            lock_guard<mutex> lock(SPIMutex); // verrouillage du mutex
             // affichage des données reçues
             cout << "Received " << n << " bytes: ";
             for (int i = 0; i < n; i++)
@@ -28,33 +29,47 @@ void SerialReadThread()
     }
 }
 
-// Fonction thread pour l'analyse des données de la liaison série
-void SerialAnalyzeThread()
+// Fonction thread pour l'analyse des données de la voie SPI
+void SPIAnalyzeThread()
 {
     while (true)
     {
-        lock_guard<mutex> lock(SerialMutex); // verrouillage du mutex
-        // TODO: Ajouter du code pour analyser les données de la liaison série
+        lock_guard<mutex> lock(SPIMutex); // verrouillage du mutex
+        // TODO: Ajouter du code pour analyser les données de la voie SPI
     }
 }
 
 int main()
 {
-    // Ouverture de la liaison série
-    if (Serial.openDevice("/dev/ttyAMA0", 115200) != 1)
+    // Ouverture de la voie SPI
+    int spi_fd = open("/dev/spidev0.0", O_RDWR);
+    if (spi_fd < 0)
     {
-        cout << "Failed to open serial port." << endl;
+        cout << "Failed to open SPI device." << endl;
+        return 1;
+    }
+
+    // Configuration de la voie SPI
+    uint8_t mode = SPI_MODE_0;
+    uint8_t bits = 8;
+    uint32_t speed = 1000000;
+    int ret = ioctl(spi_fd, SPI_IOC_WR_MODE, &mode);
+    ret |= ioctl(spi_fd, SPI_IOC_WR_BITS_PER_WORD, &bits);
+    ret |= ioctl(spi_fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed);
+    if (ret < 0)
+    {
+        cout << "Failed to configure SPI device." << endl;
         return 1;
     }
 
     // Démarrage des threads de lecture et d'analyse de données
-    thread readThread(SerialReadThread);
-    thread analyzeThread(SerialAnalyzeThread);
+    thread readThread(SPIReadThread, spi_fd);
+    thread analyzeThread(SPIAnalyzeThread);
 
-    // Attendre jusqu'à ce que l'utilisateur appuie sur une touche, puis terminer les threads et fermer la liaison série
-    cout << "Press Enter to stop." << endl;
+    // Attendre jusqu'à ce que l'utilisateur appuie sur une touche, puis terminer les threads et fermer la voie SPI
+    cout << "Press ctrl+c to stop." << endl;
     getchar();
-    Serial.closeDevice();
+    close(spi_fd);
     readThread.join();
     analyzeThread.join();
 
