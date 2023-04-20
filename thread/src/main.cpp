@@ -5,11 +5,11 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <linux/spi/spidev.h>
-
+#include <string.h>
 using namespace std;
 
 mutex SPIMutex; // déclaration du mutex pour protéger l'accès aux données de la voie SPI
-
+const int PACKET_HEADER_SIZE = 11;
 // Fonction thread pour la lecture de données sur la voie SPI
 void SPIReadThread(int spi_fd)
 {
@@ -30,12 +30,60 @@ void SPIReadThread(int spi_fd)
 }
 
 // Fonction thread pour l'analyse des données de la voie SPI
-void SPIAnalyzeThread()
+void SPIAnalyzeThread(int spi_fd)
 {
+    char buf[1024];
+    int pos = 0;
+    int len = 0;
+
     while (true)
     {
         lock_guard<mutex> lock(SPIMutex); // verrouillage du mutex
-        // TODO: Ajouter du code pour analyser les données de la voie SPI
+
+        // Lire les données de la voie SPI
+        int n = read(spi_fd, buf+pos, sizeof(buf)-pos);
+
+        if (n <= 0)
+            continue;
+
+        // Mettre à jour la position du curseur de lecture
+        pos += n;
+
+        // Vérifier si nous avons une en-tête de paquet complète
+        if (pos >= PACKET_HEADER_SIZE)
+        {
+            // Analyser l'en-tête de paquet
+            int packetLen = buf[0];
+            int packetChecksum = buf[1];
+
+            // Vérifier si nous avons un paquet complet
+            if (pos >= packetLen)
+            {
+                // Vérifier le checksum
+                int checksum = 0;
+                for (int i = 0; i < packetLen; i++)
+                    checksum += buf[i];
+
+                if (checksum == packetChecksum)
+                {
+                    // Extraire le message du paquet
+                    string message(buf + PACKET_HEADER_SIZE, packetLen - PACKET_HEADER_SIZE);
+                    cout << "Received message: " << message << endl;
+
+                    // Mettre à jour la position du curseur de lecture
+                    pos -= packetLen;
+
+                    // Décaler les données restantes vers le début du tampon
+                    if (pos > 0)
+                        memmove(buf, buf+packetLen, pos-packetLen);
+                }
+                else
+                {
+                    // Le checksum est incorrect, abandonner le paquet
+                    pos = 0;
+                }
+            }
+        }
     }
 }
 
