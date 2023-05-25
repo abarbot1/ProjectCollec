@@ -1,5 +1,5 @@
 CXX		  := g++
-CXX_FLAGS := -lrt -pthread -lm 
+CXX_FLAGS :=-lpigpio -lrt -pthread -lm 
 BIN		:= bin
 SRC		:= src
 INCLUDE	:= include

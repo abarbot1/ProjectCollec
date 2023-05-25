@@ -5,6 +5,12 @@
 #define UART_BAUD 115200
 #define STS35_I2C_ADDRESS 0x4B
 
+//Senard
+//#define URL_SERVEUR "http://10.10.33.179:3000/fact"
+
+//Lusia
+#define URL_SERVEUR "http://10.10.33.161:3000/collectemp"
+
 const char *ssid = "immobladePoint";
 const char *password = "3M_VT-MJ_SU-N3";
   HTTPClient http;
@@ -38,7 +44,9 @@ void loop()
   Serial.print("T=");
   Serial.print(sts35.readTemperature());
   Serial.println(" C");
-  http.begin("http://10.10.33.179:3000/fact");
+  //http.begin("http://10.10.33.179:3000/fact");
+  http.begin(URL_SERVEUR);
+
   http.addHeader("Content-Type", "application/x-www-form-urlencoded");
   int httpCode = http.POST("temperature="+String(derniereTemp, 2));
   if (httpCode > 0)

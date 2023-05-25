@@ -17,5 +17,7 @@ void setup() {
   Serial.print("Connected Network Signal Strength (RSSI): ");
   Serial.println(WiFi.RSSI());  /*Print WiFi signal strength*/
 }
-void loop() {
+void loop() { 
+  Serial.println(WiFi.RSSI());
+  delay(1000);
 }
