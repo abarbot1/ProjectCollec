@@ -8,7 +8,7 @@ ModuleAcquisition::ModuleAcquisition() {
 	this->batterie = new Batterie();
 	this->radio = new RadioLora();
 	this->transmetteur = new Transmetteur(this->radio);
-	this->id = 0XAABBCC;
+	this->genererId();
 }
 
 ModuleAcquisition::~ModuleAcquisition() {

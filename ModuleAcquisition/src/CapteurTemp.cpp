@@ -8,7 +8,7 @@ CapteurTemp::CapteurTemp() {
 
 CapteurTemp::CapteurTemp(uint8_t adresse) {
 	Wire.begin();
-	sts35.address(STS35_I2C_ADDRESS);
+	sts35.address(adresse);
 	// TODO - implement CapteurTemp::CapteurTemp
 }
 

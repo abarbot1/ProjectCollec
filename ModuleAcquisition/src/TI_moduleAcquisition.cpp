@@ -1,15 +1,15 @@
 #include <Arduino.h>
-#include "ModuleLum.h"
+#include "ModuleTemp.h"
 
 #define TAILLE_TRAME 9
 
-ModuleLum* moduleLum;
+ModuleTemp* moduleTemp;
 unsigned long debut;
 unsigned long fin;
 unsigned long duree;
 
 void setup() {
-  moduleLum = new ModuleLum();
+  moduleTemp = new ModuleTemp();
   Serial.begin(115200);
   Serial.println("#########################################################");
   Serial.println("# Programme de test integration du Module d'acquisition #");
@@ -20,25 +20,26 @@ void setup() {
 void loop() {
   debut=millis();
   Serial.println("______________________________________________________");
-  moduleLum->acquerirDonneeUtile();
+  moduleTemp->acquerirDonneeUtile();
   Serial.print("Récupération des données utiles : ");
-  Serial.println(moduleLum->getDonneeUtile());
+  Serial.print(moduleTemp->getDonneeUtile());
+  Serial.println("°C");
   Serial.println("______________________________________________________");
-  Serial.println("");
-  Serial.println("______________________________________________________");
-  moduleLum->acquerirDonneesSecondaires();
+  moduleTemp->acquerirDonneesSecondaires();
   Serial.println("Récupération des données secondaires : ");
-  Serial.println(moduleLum->getNiveauBatterie());
-  Serial.println(moduleLum->getRSSI());
+  Serial.print(moduleTemp->getNiveauBatterie());
+  Serial.println(" %");
+  Serial.print(moduleTemp->getRSSI());
+  Serial.println(" dbm");
   Serial.println("______________________________________________________");
   Serial.print("Trame : ");
-  char* laTrame = (char*)moduleLum->getTrame();
+  char* laTrame = (char*)moduleTemp->getTrame();
   for (int i = 0; i < TAILLE_TRAME; i++) {
     Serial.print(laTrame[i],HEX);Serial.print(' ');
   }
   Serial.println("");
-  moduleLum->transmettreDonnees();
+  moduleTemp->transmettreDonnees();
   fin=millis();
   //duree de sommeil en millisecondes
-  moduleLum->dormir(20000-fin+debut);
+  moduleTemp->dormir(20000-fin+debut);
 }
