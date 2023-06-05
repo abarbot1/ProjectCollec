@@ -26,7 +26,6 @@ void *rx_f(void *p)
     tramesRecues.push(rx->buf);
     return NULL;
 }
-
 void LoRaRx()
 {
     LoRa_ctl modem;
@@ -40,7 +39,7 @@ void LoRaRx()
     modem.eth.sf = SF12;              // Spreading Factor 12
     modem.eth.ecr = CR8;              // Error coding rate CR4/8
     modem.eth.CRC = 1;                // Turn on CRC checking
-    modem.eth.freq = 434800000;       // 434.8MHz
+    modem.eth.freq = 433000000;       // 434.8MHz
     modem.eth.resetGpioN = 4;         // GPIO4 on lora RESET pi
     modem.eth.dio0GpioN = 17;         // GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
     modem.eth.outPower = OP20;        // Output power
@@ -78,13 +77,42 @@ int main()
 {
 
     // Démarrage des threads de lecture et d'analyse de données
-    thread readThread(LoRaRx);
+    LoRa_ctl modem;
+
+    // See for typedefs, enumerations and there values in LoRa.h header file
+    modem.spiCS = 0; // Raspberry SPI CE pin number
+    modem.rx.callback = rx_f;
+    //modem.eth.payloadLen = 5; // payload len used in implicit header mode
+    modem.eth.preambleLen = 6;
+    modem.eth.bw = BW62_5;            // Bandwidth 62.5KHz
+    modem.eth.sf = SF12;              // Spreading Factor 12
+    modem.eth.ecr = CR8;              // Error coding rate CR4/8
+    modem.eth.CRC = 1;                // Turn on CRC checking
+    modem.eth.freq = 433000000;       // 434.8MHz
+    modem.eth.resetGpioN = 4;         // GPIO4 on lora RESET pi
+    modem.eth.dio0GpioN = 17;         // GPIO17 on lora DIO0 pin to control Rxdone and Txdone interrupts
+    modem.eth.outPower = OP20;        // Output power
+    modem.eth.powerOutPin = PA_BOOST; // Power Amplifire pin
+    modem.eth.AGC = 1;                // Auto Gain Control
+    modem.eth.implicitHeader = 1;     // Implicit header mode
+    modem.eth.syncWord = 0x12;
+    // For detail information about SF, Error Coding Rate, Explicit header, Bandwidth, AGC, Over current protection and other features refer to sx127x datasheet https://www.semtech.com/uploads/documents/DS_SX1276-7-8-9_W_APP_V5.pdf
+
+    LoRa_begin(&modem);
+    LoRa_receive(&modem);
+
+    
+
+    //thread readThread(LoRaRx);
     thread analyzeThread(traitementTrame);
 
     // Attendre jusqu'à ce que l'utilisateur appuie sur une touche, puis terminer les threads et fermer la voie SPI
     cout << "Press ctrl+c to stop." << endl;
     getchar();
-    readThread.join();
+    //readThread.join();
     analyzeThread.join();
+    sleep(60);
+    printf("end\n");
+    LoRa_end(&modem);
     return 0;
 }
