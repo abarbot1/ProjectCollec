@@ -17,7 +17,7 @@ void ModuleTemp::acquerirDonneeUtile() {
 void ModuleTemp::transmettreDonnees() {
 	this->transmetteur->genererTrame(	this->id,
 										'T',
-										(unsigned int)donneeUtile, //Convertir donneeUtile de float vers int.
+										(unsigned int)donneeUtile *10, //Convertir donneeUtile de float vers int.
 										this->niveauBatterie);
 	this->transmetteur->transmettreTrame();
 }
